@@ -33,9 +33,8 @@ class BookController extends Controller
 
     public function show(Book $book): BookResource
     {
-        $attributes = Cache::remember("book-{$book->id}", 3600, fn () => $book->getAttributes());
-
-        return new BookResource((new Book)->setRawAttributes($attributes));
+        $cached = Cache::remember("book-{$book->id}", 3600, fn () => $book);
+        return new BookResource($cached);
     }
 
     public function update(Request $request, Book $book): BookResource
