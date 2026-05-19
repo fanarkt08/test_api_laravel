@@ -13,7 +13,7 @@ use OpenApi\Attributes as OA;
 class UserController extends Controller
 {
     #[OA\Post(
-        path: '/api/v1/register',
+        path: '/register',
         summary: "Inscription d'un utilisateur",
         parameters: [
             new OA\Parameter(name: 'Accept', in: 'header', required: true, schema: new OA\Schema(type: 'string', default: 'application/json')),
@@ -56,7 +56,7 @@ class UserController extends Controller
     }
 
     #[OA\Post(
-        path: '/api/v1/login',
+        path: '/login',
         summary: 'Connexion et génération du token',
         parameters: [
             new OA\Parameter(name: 'Accept', in: 'header', required: true, schema: new OA\Schema(type: 'string', default: 'application/json')),
@@ -103,7 +103,7 @@ class UserController extends Controller
     }
 
     #[OA\Post(
-        path: '/api/v1/logout',
+        path: '/logout',
         summary: 'Déconnexion — supprime le token courant',
         security: [['bearerAuth' => []]],
         parameters: [

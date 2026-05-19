@@ -14,7 +14,7 @@ use OpenApi\Attributes as OA;
 class BookController extends Controller
 {
     #[OA\Get(
-        path: '/api/v1/books',
+        path: '/books',
         summary: 'Liste paginée des livres (2 par page)',
         tags: ['Livres'],
         parameters: [
@@ -43,7 +43,7 @@ class BookController extends Controller
     }
 
     #[OA\Post(
-        path: '/api/v1/books',
+        path: '/books',
         summary: 'Créer un livre',
         security: [['bearerAuth' => []]],
         parameters: [
@@ -83,7 +83,7 @@ class BookController extends Controller
     }
 
     #[OA\Get(
-        path: '/api/v1/books/{book}',
+        path: '/books/{book}',
         summary: 'Afficher un livre (mis en cache 60 min)',
         tags: ['Livres'],
         parameters: [
@@ -109,7 +109,7 @@ class BookController extends Controller
     }
 
     #[OA\Patch(
-        path: '/api/v1/books/{book}',
+        path: '/books/{book}',
         summary: 'Mettre à jour un livre (partiel)',
         security: [['bearerAuth' => []]],
         requestBody: new OA\RequestBody(
@@ -151,7 +151,7 @@ class BookController extends Controller
     }
 
     #[OA\Delete(
-        path: '/api/v1/books/{book}',
+        path: '/books/{book}',
         summary: 'Supprimer un livre',
         security: [['bearerAuth' => []]],
         tags: ['Livres'],

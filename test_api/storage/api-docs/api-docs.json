@@ -12,13 +12,13 @@
         }
     ],
     "paths": {
-        "/api/v1/books": {
+        "/books": {
             "get": {
                 "tags": [
                     "Livres"
                 ],
                 "summary": "Liste paginée des livres (2 par page)",
-                "operationId": "ab6891af84b2f0a68a33cdfe8324ce98",
+                "operationId": "921c595372ab399821e267fcf05cbaa1",
                 "parameters": [
                     {
                         "name": "Accept",
@@ -79,7 +79,7 @@
                     "Livres"
                 ],
                 "summary": "Créer un livre",
-                "operationId": "a1d219764293fcc881a84c059760d6f6",
+                "operationId": "7ab92284110ace5d0f7de52f372e70c0",
                 "parameters": [
                     {
                         "name": "Accept",
@@ -151,13 +151,13 @@
                 ]
             }
         },
-        "/api/v1/books/{book}": {
+        "/books/{book}": {
             "get": {
                 "tags": [
                     "Livres"
                 ],
                 "summary": "Afficher un livre (mis en cache 60 min)",
-                "operationId": "c6fa5108b7e7a70db4369b85323eb239",
+                "operationId": "e2b7b266227828dd53fe29fa36552b23",
                 "parameters": [
                     {
                         "name": "Accept",
@@ -211,7 +211,7 @@
                     "Livres"
                 ],
                 "summary": "Supprimer un livre",
-                "operationId": "ac1507f7ac3002c7bd54229ed7570d1c",
+                "operationId": "0780eb2036bed1adf287d40708a9c033",
                 "parameters": [
                     {
                         "name": "Accept",
@@ -254,7 +254,7 @@
                     "Livres"
                 ],
                 "summary": "Mettre à jour un livre (partiel)",
-                "operationId": "18a7cab9262615e87dda426e071e526e",
+                "operationId": "ac13e57479a7a4417ce2cdcb2d63d5cf",
                 "parameters": [
                     {
                         "name": "Accept",
@@ -332,13 +332,13 @@
                 ]
             }
         },
-        "/api/v1/register": {
+        "/register": {
             "post": {
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Inscription d'un utilisateur",
-                "operationId": "d95e62b66f4c6bb043fabf35c31875ce",
+                "operationId": "7803685ce02ef1ad1d7b190a14c06284",
                 "parameters": [
                     {
                         "name": "Accept",
@@ -406,13 +406,13 @@
                 }
             }
         },
-        "/api/v1/login": {
+        "/login": {
             "post": {
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Connexion et génération du token",
-                "operationId": "9cb2efee96b203086a6d6e3a2dcff2b0",
+                "operationId": "802efa828bed5cff912616a7ff48e617",
                 "parameters": [
                     {
                         "name": "Accept",
@@ -478,13 +478,13 @@
                 }
             }
         },
-        "/api/v1/logout": {
+        "/logout": {
             "post": {
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Déconnexion — supprime le token courant",
-                "operationId": "b1ce2afcdc7bf63047937cb7ea1141e3",
+                "operationId": "716ee9fdd4df72c5cb7cd983a3a5c2ef",
                 "parameters": [
                     {
                         "name": "Accept",
