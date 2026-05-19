@@ -8,12 +8,13 @@ use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cache;
 
 class BookController extends Controller
 {
     public function index(): AnonymousResourceCollection
     {
-        return BookResource::collection(Book::all());
+        return BookResource::collection(Book::paginate(2));
     }
 
     public function store(Request $request): BookResource
@@ -32,7 +33,10 @@ class BookController extends Controller
 
     public function show(Book $book): BookResource
     {
-        return new BookResource($book);
+        $id = $book->id;
+        $attributes = Cache::remember("book-{$id}", 3600, fn () => Book::findOrFail($id)->getAttributes());
+
+        return new BookResource((new Book)->setRawAttributes($attributes));
     }
 
     public function update(Request $request, Book $book): BookResource
