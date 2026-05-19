@@ -1,0 +1,535 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Livres",
+        "description": "API REST de gestion des livres avec authentification Sanctum.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Serveur local"
+        }
+    ],
+    "paths": {
+        "/api/v1/books": {
+            "get": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Liste paginée des livres (2 par page)",
+                "operationId": "ab6891af84b2f0a68a33cdfe8324ce98",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des livres",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "data": [
+                                        {
+                                            "title": "1984",
+                                            "author": "GEORGE ORWELL",
+                                            "summary": "Roman dystopique...",
+                                            "isbn": "9780451524935",
+                                            "_links": {
+                                                "self": "http://127.0.0.1:8000/api/v1/books/1"
+                                            }
+                                        }
+                                    ],
+                                    "links": {
+                                        "first": "...",
+                                        "last": "...",
+                                        "prev": null,
+                                        "next": "..."
+                                    },
+                                    "meta": {
+                                        "current_page": 1,
+                                        "per_page": 2,
+                                        "total": 3
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Créer un livre",
+                "operationId": "a1d219764293fcc881a84c059760d6f6",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "author",
+                                    "summary",
+                                    "isbn"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Le Petit Prince",
+                                        "maxLength": 255,
+                                        "minLength": 3
+                                    },
+                                    "author": {
+                                        "type": "string",
+                                        "example": "Antoine de Saint-Exupéry",
+                                        "maxLength": 100,
+                                        "minLength": 3
+                                    },
+                                    "summary": {
+                                        "type": "string",
+                                        "example": "Un aviateur rencontre un petit prince venu d'une autre planète.",
+                                        "maxLength": 500,
+                                        "minLength": 10
+                                    },
+                                    "isbn": {
+                                        "type": "string",
+                                        "example": "9782070408504",
+                                        "maxLength": 13,
+                                        "minLength": 13
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Livre créé"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "422": {
+                        "description": "Données invalides"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/books/{book}": {
+            "get": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Afficher un livre (mis en cache 60 min)",
+                "operationId": "c6fa5108b7e7a70db4369b85323eb239",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        }
+                    },
+                    {
+                        "name": "book",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Livre trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "data": {
+                                        "title": "1984",
+                                        "author": "GEORGE ORWELL",
+                                        "summary": "Roman dystopique...",
+                                        "isbn": "9780451524935",
+                                        "_links": {
+                                            "self": "http://127.0.0.1:8000/api/v1/books/1",
+                                            "update": "http://127.0.0.1:8000/api/v1/books/1",
+                                            "delete": "http://127.0.0.1:8000/api/v1/books/1",
+                                            "all": "http://127.0.0.1:8000/api/v1/books"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Livre introuvable"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Supprimer un livre",
+                "operationId": "ac1507f7ac3002c7bd54229ed7570d1c",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        }
+                    },
+                    {
+                        "name": "book",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Livre supprimé"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "404": {
+                        "description": "Livre introuvable"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Livres"
+                ],
+                "summary": "Mettre à jour un livre (partiel)",
+                "operationId": "18a7cab9262615e87dda426e071e526e",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        }
+                    },
+                    {
+                        "name": "book",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "1984",
+                                        "maxLength": 255,
+                                        "minLength": 3
+                                    },
+                                    "author": {
+                                        "type": "string",
+                                        "example": "George Orwell",
+                                        "maxLength": 100,
+                                        "minLength": 3
+                                    },
+                                    "summary": {
+                                        "type": "string",
+                                        "example": "Roman dystopique...",
+                                        "maxLength": 500,
+                                        "minLength": 10
+                                    },
+                                    "isbn": {
+                                        "type": "string",
+                                        "example": "9780451524935",
+                                        "maxLength": 13,
+                                        "minLength": 13
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Livre mis à jour"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    },
+                    "404": {
+                        "description": "Livre introuvable"
+                    },
+                    "422": {
+                        "description": "Données invalides"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Inscription d'un utilisateur",
+                "operationId": "d95e62b66f4c6bb043fabf35c31875ce",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe",
+                                        "maxLength": 255
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "fana@example.com",
+                                        "maxLength": 255
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "secret123",
+                                        "minLength": 8
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utilisateur créé",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "token": "1|abc123...",
+                                    "user": {
+                                        "id": 1,
+                                        "name": "John Doe",
+                                        "email": "fana@example.com"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Données invalides"
+                    }
+                }
+            }
+        },
+        "/api/v1/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Connexion et génération du token",
+                "operationId": "9cb2efee96b203086a6d6e3a2dcff2b0",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "fanample.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "secret123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "token": "1|abc123...",
+                                    "user": {
+                                        "id": 1,
+                                        "name": "John Doe",
+                                        "email": "fana@example.com"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Identifiants invalides"
+                    },
+                    "422": {
+                        "description": "Données invalides"
+                    },
+                    "429": {
+                        "description": "Trop de tentatives (max 10/min)"
+                    }
+                }
+            }
+        },
+        "/api/v1/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Déconnexion — supprime le token courant",
+                "operationId": "b1ce2afcdc7bf63047937cb7ea1141e3",
+                "parameters": [
+                    {
+                        "name": "Accept",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "application/json"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Déconnexion réussie"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Token Sanctum obtenu via POST /api/v1/login",
+                "bearerFormat": "token",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Livres",
+            "description": "Livres"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        }
+    ]
+}

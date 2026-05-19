@@ -9,14 +9,65 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
+use OpenApi\Attributes as OA;
 
 class BookController extends Controller
 {
+    #[OA\Get(
+        path: '/api/v1/books',
+        summary: 'Liste paginée des livres (2 par page)',
+        tags: ['Livres'],
+        parameters: [
+            new OA\Parameter(name: 'Accept', in: 'header', required: true, schema: new OA\Schema(type: 'string', default: 'application/json')),
+            new OA\Parameter(name: 'page', in: 'query', required: false, schema: new OA\Schema(type: 'integer', example: 1)),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Liste des livres',
+                content: new OA\JsonContent(
+                    example: [
+                        'data' => [
+                            ['title' => '1984', 'author' => 'GEORGE ORWELL', 'summary' => 'Roman dystopique...', 'isbn' => '9780451524935', '_links' => ['self' => 'http://127.0.0.1:8000/api/v1/books/1']],
+                        ],
+                        'links' => ['first' => '...', 'last' => '...', 'prev' => null, 'next' => '...'],
+                        'meta'  => ['current_page' => 1, 'per_page' => 2, 'total' => 3],
+                    ],
+                ),
+            ),
+        ],
+    )]
     public function index(): AnonymousResourceCollection
     {
         return BookResource::collection(Book::paginate(2));
     }
 
+    #[OA\Post(
+        path: '/api/v1/books',
+        summary: 'Créer un livre',
+        security: [['bearerAuth' => []]],
+        parameters: [
+            new OA\Parameter(name: 'Accept', in: 'header', required: true, schema: new OA\Schema(type: 'string', default: 'application/json')),
+        ],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                required: ['title', 'author', 'summary', 'isbn'],
+                properties: [
+                    new OA\Property(property: 'title', type: 'string', minLength: 3, maxLength: 255, example: 'Le Petit Prince'),
+                    new OA\Property(property: 'author', type: 'string', minLength: 3, maxLength: 100, example: 'Antoine de Saint-Exupéry'),
+                    new OA\Property(property: 'summary', type: 'string', minLength: 10, maxLength: 500, example: 'Un aviateur rencontre un petit prince venu d\'une autre planète.'),
+                    new OA\Property(property: 'isbn', type: 'string', minLength: 13, maxLength: 13, example: '9782070408504'),
+                ],
+            ),
+        ),
+        tags: ['Livres'],
+        responses: [
+            new OA\Response(response: 201, description: 'Livre créé'),
+            new OA\Response(response: 401, description: 'Non authentifié'),
+            new OA\Response(response: 422, description: 'Données invalides'),
+        ],
+    )]
     public function store(Request $request): BookResource
     {
         $validated = $request->validate([
@@ -31,6 +82,25 @@ class BookController extends Controller
         return new BookResource($book);
     }
 
+    #[OA\Get(
+        path: '/api/v1/books/{book}',
+        summary: 'Afficher un livre (mis en cache 60 min)',
+        tags: ['Livres'],
+        parameters: [
+            new OA\Parameter(name: 'Accept', in: 'header', required: true, schema: new OA\Schema(type: 'string', default: 'application/json')),
+            new OA\Parameter(name: 'book', in: 'path', required: true, schema: new OA\Schema(type: 'integer', example: 1)),
+        ],
+        responses: [
+            new OA\Response(
+                response: 200,
+                description: 'Livre trouvé',
+                content: new OA\JsonContent(
+                    example: ['data' => ['title' => '1984', 'author' => 'GEORGE ORWELL', 'summary' => 'Roman dystopique...', 'isbn' => '9780451524935', '_links' => ['self' => 'http://127.0.0.1:8000/api/v1/books/1', 'update' => 'http://127.0.0.1:8000/api/v1/books/1', 'delete' => 'http://127.0.0.1:8000/api/v1/books/1', 'all' => 'http://127.0.0.1:8000/api/v1/books']]],
+                ),
+            ),
+            new OA\Response(response: 404, description: 'Livre introuvable'),
+        ],
+    )]
     public function show(Book $book): BookResource
     {
         $attributes = Cache::remember("book-{$book->id}", 3600, fn () => $book->getAttributes());
@@ -38,6 +108,33 @@ class BookController extends Controller
         return new BookResource((new Book)->setRawAttributes($attributes));
     }
 
+    #[OA\Patch(
+        path: '/api/v1/books/{book}',
+        summary: 'Mettre à jour un livre (partiel)',
+        security: [['bearerAuth' => []]],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: 'title', type: 'string', minLength: 3, maxLength: 255, example: '1984'),
+                    new OA\Property(property: 'author', type: 'string', minLength: 3, maxLength: 100, example: 'George Orwell'),
+                    new OA\Property(property: 'summary', type: 'string', minLength: 10, maxLength: 500, example: 'Roman dystopique...'),
+                    new OA\Property(property: 'isbn', type: 'string', minLength: 13, maxLength: 13, example: '9780451524935'),
+                ],
+            ),
+        ),
+        tags: ['Livres'],
+        parameters: [
+            new OA\Parameter(name: 'Accept', in: 'header', required: true, schema: new OA\Schema(type: 'string', default: 'application/json')),
+            new OA\Parameter(name: 'book', in: 'path', required: true, schema: new OA\Schema(type: 'integer', example: 1)),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Livre mis à jour'),
+            new OA\Response(response: 401, description: 'Non authentifié'),
+            new OA\Response(response: 404, description: 'Livre introuvable'),
+            new OA\Response(response: 422, description: 'Données invalides'),
+        ],
+    )]
     public function update(Request $request, Book $book): BookResource
     {
         $validated = $request->validate([
@@ -53,6 +150,21 @@ class BookController extends Controller
         return new BookResource($book);
     }
 
+    #[OA\Delete(
+        path: '/api/v1/books/{book}',
+        summary: 'Supprimer un livre',
+        security: [['bearerAuth' => []]],
+        tags: ['Livres'],
+        parameters: [
+            new OA\Parameter(name: 'Accept', in: 'header', required: true, schema: new OA\Schema(type: 'string', default: 'application/json')),
+            new OA\Parameter(name: 'book', in: 'path', required: true, schema: new OA\Schema(type: 'integer', example: 1)),
+        ],
+        responses: [
+            new OA\Response(response: 204, description: 'Livre supprimé'),
+            new OA\Response(response: 401, description: 'Non authentifié'),
+            new OA\Response(response: 404, description: 'Livre introuvable'),
+        ],
+    )]
     public function destroy(Book $book): Response
     {
         $book->delete();
