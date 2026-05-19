@@ -33,8 +33,7 @@ class BookController extends Controller
 
     public function show(Book $book): BookResource
     {
-        $id = $book->id;
-        $attributes = Cache::remember("book-{$id}", 3600, fn () => Book::findOrFail($id)->getAttributes());
+        $attributes = Cache::remember("book-{$book->id}", 3600, fn () => $book->getAttributes());
 
         return new BookResource((new Book)->setRawAttributes($attributes));
     }
@@ -49,6 +48,7 @@ class BookController extends Controller
         ]);
 
         $book->update($validated);
+        Cache::forget("book-{$book->id}");
 
         return new BookResource($book);
     }
@@ -56,6 +56,7 @@ class BookController extends Controller
     public function destroy(Book $book): Response
     {
         $book->delete();
+        Cache::forget("book-{$book->id}");
 
         return response()->noContent();
     }
