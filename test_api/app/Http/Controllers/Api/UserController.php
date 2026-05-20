@@ -23,8 +23,8 @@ class UserController extends Controller
             content: new OA\JsonContent(
                 required: ['name', 'email', 'password'],
                 properties: [
-                    new OA\Property(property: 'name', type: 'string', maxLength: 255, example: 'John Doe'),
-                    new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255, example: 'fana@example.com'),
+                    new OA\Property(property: 'name', type: 'string', maxLength: 255, example: 'Jane Doe'),
+                    new OA\Property(property: 'email', type: 'string', format: 'email', maxLength: 255, example: 'jane@example.com'),
                     new OA\Property(property: 'password', type: 'string', minLength: 8, example: 'secret123'),
                 ],
             ),
@@ -35,10 +35,19 @@ class UserController extends Controller
                 response: 201,
                 description: 'Utilisateur créé',
                 content: new OA\JsonContent(
-                    example: ['token' => '1|abc123...', 'user' => ['id' => 1, 'name' => 'John Doe', 'email' => 'fana@example.com']],
+                    example: [
+                        'token' => '1|P24uxIp4amrYV0fRN4Caojycu7AsZbwEH5fVPG6r19c8f138',
+                        'user'  => ['id' => 1, 'name' => 'Jane Doe', 'email' => 'jane@example.com', 'created_at' => '2026-05-19T10:00:00Z'],
+                    ],
                 ),
             ),
-            new OA\Response(response: 422, description: 'Données invalides'),
+            new OA\Response(
+                response: 422,
+                description: 'Données invalides',
+                content: new OA\JsonContent(
+                    example: ['message' => 'The email has already been taken.', 'errors' => ['email' => ['The email has already been taken.']]],
+                ),
+            ),
         ],
     )]
     public function register(Request $request): JsonResponse
@@ -66,7 +75,7 @@ class UserController extends Controller
             content: new OA\JsonContent(
                 required: ['email', 'password'],
                 properties: [
-                    new OA\Property(property: 'email', type: 'string', format: 'email', example: 'fanample.com'),
+                    new OA\Property(property: 'email', type: 'string', format: 'email', example: 'jane@example.com'),
                     new OA\Property(property: 'password', type: 'string', example: 'secret123'),
                 ],
             ),
@@ -77,11 +86,26 @@ class UserController extends Controller
                 response: 200,
                 description: 'Connexion réussie',
                 content: new OA\JsonContent(
-                    example: ['token' => '1|abc123...', 'user' => ['id' => 1, 'name' => 'John Doe', 'email' => 'fana@example.com']],
+                    example: [
+                        'token' => '1|P24uxIp4amrYV0fRN4Caojycu7AsZbwEH5fVPG6r19c8f138',
+                        'user'  => ['id' => 1, 'name' => 'Jane Doe', 'email' => 'jane@example.com', 'created_at' => '2026-05-19T10:00:00Z'],
+                    ],
                 ),
             ),
-            new OA\Response(response: 401, description: 'Identifiants invalides'),
-            new OA\Response(response: 422, description: 'Données invalides'),
+            new OA\Response(
+                response: 401,
+                description: 'Identifiants invalides',
+                content: new OA\JsonContent(
+                    example: ['message' => 'Identifiants invalides.'],
+                ),
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Données invalides',
+                content: new OA\JsonContent(
+                    example: ['message' => 'The email field must be a valid email address.', 'errors' => ['email' => ['The email field must be a valid email address.']]],
+                ),
+            ),
             new OA\Response(response: 429, description: 'Trop de tentatives (max 10/min)'),
         ],
     )]
@@ -108,11 +132,18 @@ class UserController extends Controller
         security: [['bearerAuth' => []]],
         parameters: [
             new OA\Parameter(name: 'Accept', in: 'header', required: true, schema: new OA\Schema(type: 'string', default: 'application/json')),
+            new OA\Parameter(name: 'Authorization', in: 'header', required: true, schema: new OA\Schema(type: 'string', default: 'Bearer <token>')),
         ],
         tags: ['Auth'],
         responses: [
-            new OA\Response(response: 204, description: 'Déconnexion réussie'),
-            new OA\Response(response: 401, description: 'Non authentifié'),
+            new OA\Response(response: 204, description: 'Déconnexion réussie — aucun contenu'),
+            new OA\Response(
+                response: 401,
+                description: 'Non authentifié',
+                content: new OA\JsonContent(
+                    example: ['message' => 'Unauthenticated.'],
+                ),
+            ),
         ],
     )]
     public function logout(Request $request): Response

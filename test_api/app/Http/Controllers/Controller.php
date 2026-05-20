@@ -10,7 +10,7 @@ use OpenApi\Attributes as OA;
     description: 'API REST de gestion des livres avec authentification Sanctum.',
 )]
 #[OA\Server(
-    url: 'http://127.0.0.1:8000',
+    url: 'http://127.0.0.1:8000/api/v1',
     description: 'Serveur local',
 )]
 #[OA\SecurityScheme(

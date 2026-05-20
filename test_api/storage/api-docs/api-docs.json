@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8000",
+            "url": "http://127.0.0.1:8000/api/v1",
             "description": "Serveur local"
         }
     ],
@@ -50,22 +50,40 @@
                                         {
                                             "title": "1984",
                                             "author": "GEORGE ORWELL",
-                                            "summary": "Roman dystopique...",
+                                            "summary": "Roman dystopique décrivant une société totalitaire contrôlée par Big Brother.",
                                             "isbn": "9780451524935",
                                             "_links": {
-                                                "self": "http://127.0.0.1:8000/api/v1/books/1"
+                                                "self": "http://127.0.0.1:8000/api/v1/books/1",
+                                                "update": "http://127.0.0.1:8000/api/v1/books/1",
+                                                "delete": "http://127.0.0.1:8000/api/v1/books/1",
+                                                "all": "http://127.0.0.1:8000/api/v1/books"
+                                            }
+                                        },
+                                        {
+                                            "title": "Dune",
+                                            "author": "FRANK HERBERT",
+                                            "summary": "Épopée de science-fiction centrée sur la planète Arrakis.",
+                                            "isbn": "9780441013593",
+                                            "_links": {
+                                                "self": "http://127.0.0.1:8000/api/v1/books/2",
+                                                "update": "http://127.0.0.1:8000/api/v1/books/2",
+                                                "delete": "http://127.0.0.1:8000/api/v1/books/2",
+                                                "all": "http://127.0.0.1:8000/api/v1/books"
                                             }
                                         }
                                     ],
                                     "links": {
-                                        "first": "...",
-                                        "last": "...",
+                                        "first": "http://127.0.0.1:8000/api/v1/books?page=1",
+                                        "last": "http://127.0.0.1:8000/api/v1/books?page=2",
                                         "prev": null,
-                                        "next": "..."
+                                        "next": "http://127.0.0.1:8000/api/v1/books?page=2"
                                     },
                                     "meta": {
                                         "current_page": 1,
+                                        "from": 1,
+                                        "last_page": 2,
                                         "per_page": 2,
+                                        "to": 2,
                                         "total": 3
                                     }
                                 }
@@ -88,6 +106,15 @@
                         "schema": {
                             "type": "string",
                             "default": "application/json"
+                        }
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "Bearer <token>"
                         }
                     }
                 ],
@@ -135,13 +162,53 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Livre créé"
+                        "description": "Livre créé",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "data": {
+                                        "title": "Le Petit Prince",
+                                        "author": "ANTOINE DE SAINT-EXUPÉRY",
+                                        "summary": "Un aviateur rencontre un petit prince venu d'une autre planète.",
+                                        "isbn": "9782070408504",
+                                        "_links": {
+                                            "self": "http://127.0.0.1:8000/api/v1/books/4",
+                                            "update": "http://127.0.0.1:8000/api/v1/books/4",
+                                            "delete": "http://127.0.0.1:8000/api/v1/books/4",
+                                            "all": "http://127.0.0.1:8000/api/v1/books"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Non authentifié"
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "Unauthenticated."
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Données invalides"
+                        "description": "Données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "The isbn has already been taken.",
+                                    "errors": {
+                                        "isbn": [
+                                            "The isbn has already been taken."
+                                        ]
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -188,7 +255,7 @@
                                     "data": {
                                         "title": "1984",
                                         "author": "GEORGE ORWELL",
-                                        "summary": "Roman dystopique...",
+                                        "summary": "Roman dystopique décrivant une société totalitaire contrôlée par Big Brother.",
                                         "isbn": "9780451524935",
                                         "_links": {
                                             "self": "http://127.0.0.1:8000/api/v1/books/1",
@@ -202,7 +269,15 @@
                         }
                     },
                     "404": {
-                        "description": "Livre introuvable"
+                        "description": "Livre introuvable",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "No query results for model [App\\Models\\Book] 99"
+                                }
+                            }
+                        }
                     }
                 }
             },
@@ -223,6 +298,15 @@
                         }
                     },
                     {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "Bearer <token>"
+                        }
+                    },
+                    {
                         "name": "book",
                         "in": "path",
                         "required": true,
@@ -234,13 +318,29 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "Livre supprimé"
+                        "description": "Livre supprimé — aucun contenu"
                     },
                     "401": {
-                        "description": "Non authentifié"
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "Unauthenticated."
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Livre introuvable"
+                        "description": "Livre introuvable",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "No query results for model [App\\Models\\Book] 99"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -263,6 +363,15 @@
                         "schema": {
                             "type": "string",
                             "default": "application/json"
+                        }
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "Bearer <token>"
                         }
                     },
                     {
@@ -313,16 +422,64 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Livre mis à jour"
+                        "description": "Livre mis à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "data": {
+                                        "title": "1984",
+                                        "author": "GEORGE ORWELL",
+                                        "summary": "Roman dystopique décrivant une société totalitaire contrôlée par Big Brother.",
+                                        "isbn": "9780451524935",
+                                        "_links": {
+                                            "self": "http://127.0.0.1:8000/api/v1/books/1",
+                                            "update": "http://127.0.0.1:8000/api/v1/books/1",
+                                            "delete": "http://127.0.0.1:8000/api/v1/books/1",
+                                            "all": "http://127.0.0.1:8000/api/v1/books"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "401": {
-                        "description": "Non authentifié"
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "Unauthenticated."
+                                }
+                            }
+                        }
                     },
                     "404": {
-                        "description": "Livre introuvable"
+                        "description": "Livre introuvable",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "No query results for model [App\\Models\\Book] 99"
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Données invalides"
+                        "description": "Données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "The isbn field must be 13 characters.",
+                                    "errors": {
+                                        "isbn": [
+                                            "The isbn field must be 13 characters."
+                                        ]
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -363,13 +520,13 @@
                                 "properties": {
                                     "name": {
                                         "type": "string",
-                                        "example": "John Doe",
+                                        "example": "Jane Doe",
                                         "maxLength": 255
                                     },
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "fana@example.com",
+                                        "example": "jane@example.com",
                                         "maxLength": 255
                                     },
                                     "password": {
@@ -390,18 +547,32 @@
                             "application/json": {
                                 "schema": {},
                                 "example": {
-                                    "token": "1|abc123...",
+                                    "token": "1|P24uxIp4amrYV0fRN4Caojycu7AsZbwEH5fVPG6r19c8f138",
                                     "user": {
                                         "id": 1,
-                                        "name": "John Doe",
-                                        "email": "fana@example.com"
+                                        "name": "Jane Doe",
+                                        "email": "jane@example.com",
+                                        "created_at": "2026-05-19T10:00:00Z"
                                     }
                                 }
                             }
                         }
                     },
                     "422": {
-                        "description": "Données invalides"
+                        "description": "Données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "The email has already been taken.",
+                                    "errors": {
+                                        "email": [
+                                            "The email has already been taken."
+                                        ]
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -437,7 +608,7 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "fanample.com"
+                                        "example": "jane@example.com"
                                     },
                                     "password": {
                                         "type": "string",
@@ -456,21 +627,43 @@
                             "application/json": {
                                 "schema": {},
                                 "example": {
-                                    "token": "1|abc123...",
+                                    "token": "1|P24uxIp4amrYV0fRN4Caojycu7AsZbwEH5fVPG6r19c8f138",
                                     "user": {
                                         "id": 1,
-                                        "name": "John Doe",
-                                        "email": "fana@example.com"
+                                        "name": "Jane Doe",
+                                        "email": "jane@example.com",
+                                        "created_at": "2026-05-19T10:00:00Z"
                                     }
                                 }
                             }
                         }
                     },
                     "401": {
-                        "description": "Identifiants invalides"
+                        "description": "Identifiants invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "Identifiants invalides."
+                                }
+                            }
+                        }
                     },
                     "422": {
-                        "description": "Données invalides"
+                        "description": "Données invalides",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "The email field must be a valid email address.",
+                                    "errors": {
+                                        "email": [
+                                            "The email field must be a valid email address."
+                                        ]
+                                    }
+                                }
+                            }
+                        }
                     },
                     "429": {
                         "description": "Trop de tentatives (max 10/min)"
@@ -494,14 +687,31 @@
                             "type": "string",
                             "default": "application/json"
                         }
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "default": "Bearer <token>"
+                        }
                     }
                 ],
                 "responses": {
                     "204": {
-                        "description": "Déconnexion réussie"
+                        "description": "Déconnexion réussie — aucun contenu"
                     },
                     "401": {
-                        "description": "Non authentifié"
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "example": {
+                                    "message": "Unauthenticated."
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
