@@ -21,6 +21,5 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(191);
-        \Illuminate\Support\Facades\DB::statement("SET sql_require_primary_key=0");
     }
 }

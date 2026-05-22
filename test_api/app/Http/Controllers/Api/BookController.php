@@ -7,7 +7,6 @@ use App\Http\Resources\BookResource;
 use App\Models\Book;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use OpenApi\Attributes as OA;
@@ -134,7 +133,7 @@ class BookController extends Controller
             ),
         ],
     )]
-    public function store(Request $request): JsonResponse
+    public function store(Request $request): BookResource
     {
         $validated = $request->validate([
             'title'   => 'required|string|min:3|max:255',
@@ -145,7 +144,7 @@ class BookController extends Controller
 
         $book = Book::create($validated);
 
-        return (new BookResource($book))->response()->setStatusCode(201);
+        return new BookResource($book);
     }
 
     #[OA\Get(
